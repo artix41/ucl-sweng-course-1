@@ -1,4 +1,5 @@
 import json
+import matplotlib.pyplot as plt
 
 
 def load_covid_data(filepath):
@@ -20,7 +21,14 @@ def cases_per_population_by_age(input_data):
 
 
 def hospital_vs_confirmed(input_data):
-    raise NotImplementedError
+    list_date = list(input_data["evolution"].keys())
+    list_percentage_hosp = []
+    for date in list_date:
+        n_hospitalized = input_data["evolution"][date]["hospitalizations"]["hospitalized"]["new"]["all"]
+        n_cases = input_data["evolution"][date]["epidemiology"]["confirmed"]["new"]["all"]
+        list_percentage_hosp.append(n_hospitalized / n_cases)
+
+    return list_date, list_percentage_hosp
 
 
 def generate_data_plot_confirmed(input_data, sex, max_age, status):
