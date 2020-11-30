@@ -1,13 +1,19 @@
-# FIXME add needed imports
+import json
+
 
 def load_covid_data(filepath):
-    raise NotImplementedError
+    with open(filepath) as json_file:
+        data = json.load(json_file)
+    return data
+
 
 def cases_per_population_by_age(input_data):
     raise NotImplementedError
 
+
 def hospital_vs_confirmed(input_data):
     raise NotImplementedError
+
 
 def generate_data_plot_confirmed(input_data, sex, max_age, status):
     """
@@ -17,6 +23,7 @@ def generate_data_plot_confirmed(input_data, sex, max_age, status):
     status: 'new' or 'total' (default: 'total')
     """
     raise NotImplementedError
+
 
 def create_confirmed_plot(input_data, sex=False, max_ages=[], status=..., save=...):
     # FIXME check that only sex or age is specified.
@@ -38,11 +45,14 @@ def create_confirmed_plot(input_data, sex=False, max_ages=[], status=..., save=.
     #      where type may be sex or age
     plt.show()
 
+
 def compute_running_average(data, window):
     raise NotImplementedError
 
+
 def simple_derivative(data):
     raise NotImplementedError
+
 
 def count_high_rain_low_tests_days(input_data):
     raise NotImplementedError
