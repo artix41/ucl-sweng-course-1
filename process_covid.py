@@ -8,7 +8,15 @@ def load_covid_data(filepath):
 
 
 def cases_per_population_by_age(input_data):
-    raise NotImplementedError
+    total_population = input_data["region"]["population"]["age"]
+    age_binning = input_data["metadata"]["age_binning"]["population"]
+    result = {age_binning[i]: [] for i in range(len(age_binning))}
+    for date in input_data["evolution"].keys():
+        for idx_age in range(4):
+            cases = input_data["evolution"][date]["epidemiology"]["confirmed"]["total"]["age"][idx_age]
+            percentage = cases / total_population[idx_age]
+            result[age_binning[idx_age]].append((date, percentage))
+    return result
 
 
 def hospital_vs_confirmed(input_data):
