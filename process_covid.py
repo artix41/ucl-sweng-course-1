@@ -223,12 +223,9 @@ def count_high_rain_low_tests_days(input_data):
     list_dates = input_data["evolution"].keys()
     rain_data = [input_data["evolution"][date]["weather"]["rainfall"] for date in list_dates]
     test_data = [input_data["evolution"][date]["epidemiology"]["tested"]["new"]["all"] for date in list_dates]
-    smooth_rain_data = compute_running_average(rain_data, 7)
     smooth_test_data = compute_running_average(test_data, 7)
-    deriv_rain_data = simple_derivative(smooth_rain_data)
+    deriv_rain_data = simple_derivative(rain_data)
     deriv_test_data = simple_derivative(smooth_test_data)
-    print(deriv_test_data)
-    print(deriv_rain_data)
     total_days_rain_increased = sum([int(a is not None and a > 0) for a in deriv_rain_data])
     n = len(list_dates)
     total_days_rain_increased_test_decreased = sum([int(deriv_rain_data[i] is not None and deriv_rain_data[i] > 0
