@@ -73,7 +73,6 @@ def cases_per_population_by_age(input_data):
     age_binning_cases = input_data["metadata"]["age_binning"]["hospitalizations"]
 
     list_id1, list_id2 = merge_age_binning(age_binning_population, age_binning_cases)
-    print(age_binning_population, age_binning_cases)
     new_total_population = sum_sublists(total_population, list_id1)
     new_age_binning = get_new_age_binning(age_binning_population, list_id1)
 
@@ -127,7 +126,7 @@ def generate_data_plot_confirmed(input_data, sex, max_age, status):
 
         return list_dates, list_confirmed_cases
     else:
-        age_binning = input_data["metadata"]["age_binning"]["population"]
+        age_binning = input_data["metadata"]["age_binning"]["hospitalizations"]
         min_ages_available = [int(age_range.split("-")[0]) for age_range in age_binning]
 
         selected_age_idx = 0
