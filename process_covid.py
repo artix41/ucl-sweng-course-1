@@ -119,7 +119,21 @@ def create_confirmed_plot(input_data, sex=False, max_ages=[], status="total", sa
 
 
 def compute_running_average(data, window):
-    raise NotImplementedError
+    result = []
+    shift = int((window - 1) / 2)
+    for i in range(len(data)):
+        if i < shift or i >= len(data) - shift:
+            result.append(None)
+        else:
+            sum_window, n_values = 0, 0
+            for j in range(i-shift, i+shift+1):
+                if data[j] is not None:
+                    sum_window += data[j]
+                    n_values += 1
+            avg = None if n_values == 0 else sum_window / n_values
+            result.append(avg)
+
+    return result
 
 
 def simple_derivative(data):
