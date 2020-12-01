@@ -137,7 +137,13 @@ def compute_running_average(data, window):
 
 
 def simple_derivative(data):
-    raise NotImplementedError
+    result = [None]
+    for i in range(1, len(data)):
+        if data[i] is None or data[i-1] is None:
+            result.append(None)
+        else:
+            result.append(data[i] - data[i-1])
+    return result
 
 
 def count_high_rain_low_tests_days(input_data):
