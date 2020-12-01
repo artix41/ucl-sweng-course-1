@@ -119,6 +119,8 @@ def create_confirmed_plot(input_data, sex=False, max_ages=[], status="total", sa
 
 
 def compute_running_average(data, window):
+    if window % 2 == 0:
+        raise ValueError("'window' should be an odd integer")
     result = []
     shift = int((window - 1) / 2)
     for i in range(len(data)):
