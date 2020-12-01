@@ -1,0 +1,77 @@
+{
+  "metadata": {
+    "time-range": {
+      "start_date": "String",
+      "stop_date": "String"
+    },
+    "age_binning": {
+      "hospitalizations": "[String]",
+      "population": "[String]"
+    }
+  },
+  "region": {
+    "name": "String",
+    "key": "String",
+    "latitude": "Decimal",
+    "longitude": "Decimal",
+    "elevation": "Decimal",
+    "area": {
+      "total": "Decimal",
+      "rural": "Decimal",
+      "urban": "Decimal"
+    },
+    "population": {
+      "total": "Integer",
+      "male": "Integer",
+      "female": "Integer",
+      "age": "[Integer]",
+      "rural": "Integer",
+      "urban": "Integer"
+    },
+    "open_street_maps": "Integer",
+    "noaa_station": "Integer",
+    "noaa_distance": "Decimal"
+  },
+  "evolution": {
+    "<date>": {
+      "hospitalizations": {
+        "hospitalized": {
+          "new": {
+            "all": "Integer",
+            "male": "Integer",
+            "female": "Integer",
+            "age": "[Integer]"
+          },
+          "total": "<idem new>",
+          "current": "{ <idem new> }"
+        },
+        "intensive_care": " <idem hospitalized> }",
+        "ventilator": "{ <idem hospitalized> }"
+      },
+      "epidemiology": {
+        "confirmed": {
+          "new": "{ <idem hosipitalizations/hospitalized/new> }",
+          "total": "{ <idem hosipitalizations/hospitalized/new> }"
+        },
+        "deceased": "{ <idem confirmed> }",
+        "recovered": "{ <idem confirmed> }",
+        "tested": "{ <idem confirmed>}"
+      },
+      "weather": {
+        "temperature": {
+          "average": "Decimal",
+          "min": "Decimal",
+          "max": "Decimal"
+        },
+        "rainfall": "Decimal",
+        "snowfall": "Decimal",
+        "dew_point": "Decimal",
+        "relative_humidity": "Decimal"
+      },
+      "government_response": {
+        "<various_parameters>": "Integer",
+        "stringency_index": "Decimal"
+      }
+    }
+  }
+}

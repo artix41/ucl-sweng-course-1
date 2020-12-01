@@ -1,5 +1,6 @@
 import json
 import matplotlib.pyplot as plt
+from validate_schema import validate_schema
 
 
 def merge_age_binning(age_binning1, age_binning2):
@@ -60,6 +61,8 @@ def get_new_age_binning(init_age_binning, indices):
 
 
 def load_covid_data(filepath):
+    if not validate_schema("covid_data/schema.json", filepath):
+        raise ValueError(f"Incorrect schema given in {filepath}")
     with open(filepath) as json_file:
         data = json.load(json_file)
     return data
@@ -68,9 +71,13 @@ def load_covid_data(filepath):
 def cases_per_population_by_age(input_data):
     total_population = input_data["region"]["population"]["age"]
     if None in total_population:
-        raise ValueError("Missing data in 'region'->'population'->'age'")
+        raise ValueError("Missing data at 'region'->'population'->'age'")
     age_binning_population = input_data["metadata"]["age_binning"]["population"]
+    if len(age_binning_population) == 0:
+        raise ValueError("Age binning not provided for the population")
     age_binning_cases = input_data["metadata"]["age_binning"]["hospitalizations"]
+    if len(age_binning_cases) == 0:
+        raise ValueError("Age binning not provided for the hospitalizations")
 
     list_id1, list_id2 = merge_age_binning(age_binning_population, age_binning_cases)
     new_total_population = sum_sublists(total_population, list_id1)
@@ -80,7 +87,7 @@ def cases_per_population_by_age(input_data):
     for date in input_data["evolution"].keys():
         total_cases = input_data["evolution"][date]["epidemiology"]["confirmed"]["total"]["age"]
         if None in total_cases:
-            raise ValueError(f"Missing data in 'evolution'->{date}->'epidemiology'->'confirmed'->'total'->'age'")
+            raise ValueError(f"Missing data at 'evolution'->{date}->'epidemiology'->'confirmed'->'total'->'age'")
 
         new_total_cases = sum_sublists(total_cases, list_id2)
 
@@ -95,7 +102,11 @@ def hospital_vs_confirmed(input_data):
     list_percentage_hosp = []
     for date in list_date:
         n_hospitalized = input_data["evolution"][date]["hospitalizations"]["hospitalized"]["new"]["all"]
+        if n_hospitalized is None:
+            raise ValueError(f"Missing data at 'evolution'->'{date}'->'hospitalizations'->'hospitalized'->'new'->'all'")
         n_cases = input_data["evolution"][date]["epidemiology"]["confirmed"]["new"]["all"]
+        if n_cases is None:
+            raise ValueError(f"Missing data at 'evolution'->'{date}'->'epidemiology'->'confirmed'->'new'->'all'")
         list_percentage_hosp.append(n_hospitalized / n_cases)
 
     return list_date, list_percentage_hosp
@@ -122,6 +133,8 @@ def generate_data_plot_confirmed(input_data, sex, max_age, status):
 
         for date in list_dates:
             n_conf_cases = input_data["evolution"][date]["epidemiology"]["confirmed"][status][sex]
+            if n_conf_cases is None:
+                raise ValueError(f"Missing data at 'evolution'->'{date}'->'epidemiology'->'confirmed'->'{status}'->'{sex}'")
             list_confirmed_cases.append(n_conf_cases)
 
         return list_dates, list_confirmed_cases
@@ -143,6 +156,8 @@ def generate_data_plot_confirmed(input_data, sex, max_age, status):
                 [input_data["evolution"][date]["epidemiology"]["confirmed"][status]["age"][idx_age]
                  for idx_age in range(selected_age_idx+1)]
             )
+            if n_conf_cases is None:
+                raise ValueError(f"Missing data at 'evolution'->'{date}'->'epidemiology'->'confirmed'->'{status}'->'age'")
             list_confirmed_cases.append(n_conf_cases)
 
         return list_dates, list_confirmed_cases, actual_max_age

@@ -82,7 +82,7 @@ def test_cases_per_population_by_age():
 
     input_data = {"metadata": {"age_binning": {"population": ['0-19', '20-39', '40-'],
                                                "hospitalizations": ['0-9', '10-39', '40-49', '50-']}},
-                  "region": {"population": {"age": [None, 200, 800]}},
+                  "region": {"population": {"age": [None, None, None]}},
                   "evolution": {"01-01-2020":
                                     {"epidemiology": {"confirmed": {"total": {"age": [10, 50, 20, 60]}}}},
                                 "01-02-2020":
@@ -90,5 +90,28 @@ def test_cases_per_population_by_age():
     with raises(ValueError) as exception:
         cases_per_population_by_age(input_data)
 
-    assert result == {'0-39': [("01-01-2020", 0.2), ("01-02-2020", 0.4)],
-                      '40-': [("01-01-2020", 0.1), ("01-02-2020", 0.1)]}
+        input_data = {"metadata": {"age_binning": {"population": ['0-19', '20-39', '40-'],
+                                                   "hospitalizations": ['0-9', '10-39', '40-49', '50-']}},
+                      "region": {"population": {"age": [100, 200, 800]}},
+                      "evolution": {"01-01-2020":
+                                        {"epidemiology": {"confirmed": {"total": {"age": [None, None, None, None]}}}},
+                                    "01-02-2020":
+                                        {"epidemiology": {"confirmed": {"total": {"age": [None, None, None, None]}}}}}}
+        with raises(ValueError) as exception:
+            cases_per_population_by_age(input_data)
+
+
+def test_load_covid_data():
+    input_data = {"metadata": {"age_binning": {"population": ['0-19', '20-39', '40-'],
+                                               "hospitalizations": ['0-9', '10-39', '40-49', '50-']}},
+                  "region": {"population": {"age": [100, 200, 800]}},
+                  "evolution": {"01-01-2020":
+                                    {"epidemiology": {"confirmed": {"total": {"age": [10, 50, 20, 60]}}}},
+                                "01-02-2020":
+                                    {"epidemiology": {"confirmed": {"total": {"age": [20, 100, 20, 60]}}}}}}
+
+    with open('fake_data.json', 'w') as fake_datafile:
+        json.dump(input_data, fake_datafile)
+
+    with raises(ValueError) as exception:
+        load_covid_data("fake_data.json")
