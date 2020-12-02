@@ -115,3 +115,20 @@ def test_load_covid_data():
 
     with raises(ValueError) as exception:
         load_covid_data("fake_data.json")
+
+
+def test_hospital_vs_confirmed():
+    input_data = {"evolution": {"01-01-2020": {"hospitalizations": {"hospitalized": {"new": {"all": None}}},
+                                               "epidemiology": {"confirmed": {"new": {"all": 20}}}},
+                                "01-02-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 20}}},
+                                               "epidemiology": {"confirmed": {"new": {"all": 20}}}}}}
+
+    with raises(ValueError) as exception:
+        hospital_vs_confirmed(input_data)
+
+    input_data = {"evolution": {"01-01-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 20}}},
+                                               "epidemiology": {"confirmed": {"new": {"all": 20}}}},
+                                "01-02-2020": {"hospitalizations": {"hospitalized": {"new": {"all": None}}},
+                                               "epidemiology": {"confirmed": {"new": {"all": 20}}}}}}
+    with raises(ValueError) as exception:
+        hospital_vs_confirmed(input_data)
