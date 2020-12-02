@@ -91,15 +91,15 @@ def test_cases_per_population_by_age():
     with raises(ValueError) as exception:
         cases_per_population_by_age(input_data)
 
-        input_data = {"metadata": {"age_binning": {"population": ['0-19', '20-39', '40-'],
-                                                   "hospitalizations": ['0-9', '10-39', '40-49', '50-']}},
-                      "region": {"population": {"age": [100, 200, 800]}},
-                      "evolution": {"01-01-2020":
-                                        {"epidemiology": {"confirmed": {"total": {"age": [None, None, None, None]}}}},
-                                    "01-02-2020":
-                                        {"epidemiology": {"confirmed": {"total": {"age": [None, None, None, None]}}}}}}
-        with raises(ValueError) as exception:
-            cases_per_population_by_age(input_data)
+    input_data = {"metadata": {"age_binning": {"population": ['0-19', '20-39', '40-'],
+                                               "hospitalizations": ['0-9', '10-39', '40-49', '50-']}},
+                  "region": {"population": {"age": [100, 200, 800]}},
+                  "evolution": {"01-01-2020":
+                                    {"epidemiology": {"confirmed": {"total": {"age": [None, None, None, None]}}}},
+                                "01-02-2020":
+                                    {"epidemiology": {"confirmed": {"total": {"age": [None, None, None, None]}}}}}}
+    with raises(ValueError) as exception:
+        cases_per_population_by_age(input_data)
 
 
 def test_load_covid_data():
