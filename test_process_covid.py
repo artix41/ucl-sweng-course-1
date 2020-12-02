@@ -14,6 +14,7 @@ def test_compute_running_average():
 
     equality_list(compute_running_average([0, 1, 5, 2, 2, 5], 3), [None, 2.0, 2.6666, 3.0, 3.0, None])
     equality_list(compute_running_average([2, None, 4], 3), [None, 3.0, None])
+    equality_list(compute_running_average([2, None, 4], 5), [None, None, None])
 
 
 def test_simple_derivative():
