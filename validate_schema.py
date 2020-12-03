@@ -7,9 +7,6 @@ def recursive_check(dict_schema, dict_data):
     if not isinstance(dict_data, dict):
         return False
 
-    print(dict_schema.keys(), dict_data.keys())
-    print("\n")
-
     if list(dict_schema.keys())[0] == "<date>":
         for key in dict_data.keys():
             if not recursive_check(dict_schema["<date>"], dict_data[key]):
