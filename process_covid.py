@@ -124,50 +124,78 @@ def generate_data_plot_confirmed(input_data, sex, max_age, status):
     # if not sex and not max_age:
     #     raise ValueError("Either sex or max_ages should be specified")
 
-    list_dates = list(input_data["evolution"].keys())
-    list_confirmed_cases = []
+    linestyle = {"total": "-", "new": "--"}
+    sex_color = {'male': "green",
+                 'female': "purple"}
+    age_color = {'25': "green",
+                 '50': "orange",
+                 '75': "purple",
+                 '20000': "pink"}
+
+    if status not in {'new', 'total'}:
+        raise ValueError(f"Status must be either 'new' or 'total', not {status}")
+
+    data_plot = {'date': list(input_data["evolution"].keys()),
+                 'value': [],
+                 'color': None,
+                 'linestyle': linestyle[status],
+                 'actual_max_age': None,
+                 'label': None,
+                 }
+
     if sex is not None and sex is not False:
         if sex not in ["male", "female"]:
-            raise ValueError("The argument 'sex' should be either 'male' or 'female'")
-
-        for date in list_dates:
+            raise ValueError(f"'sex' must be either 'male' or 'female', not {sex}")
+        if max_age is not None:
+            raise ValueError(f"Both 'sex' and 'max_age' are specified, but at least one of them should be None")
+        data_plot['color'] = sex_color[sex]
+        data_plot['label'] = f"{status} {sex}"
+        for date in data_plot['date']:
             n_conf_cases = input_data["evolution"][date]["epidemiology"]["confirmed"][status][sex]
             if n_conf_cases is None:
                 raise ValueError(f"Missing data at 'evolution'->'{date}'->'epidemiology'->'confirmed'->'{status}'->'{sex}'")
-            list_confirmed_cases.append(n_conf_cases)
+            data_plot['value'].append(n_conf_cases)
 
-        return list_dates, list_confirmed_cases
+        return data_plot
     else:
+        if not isinstance(max_age, int):
+            raise ValueError(f"'max_age' should be an integer, not {max_age} of type {type(max_age)}")
         age_binning = input_data["metadata"]["age_binning"]["hospitalizations"]
         min_ages_available = [int(age_range.split("-")[0]) for age_range in age_binning]
 
+        # Decide the actual maximum age based on the bins
         selected_age_idx = 0
         for idx_age, age in enumerate(min_ages_available):
             if max_age >= age:
                 selected_age_idx = idx_age
         if selected_age_idx == len(age_binning) - 1:
-            actual_max_age = "infinity"
+            data_plot['actual_max_age'] = "200"
         else:
-            actual_max_age = age_binning[selected_age_idx].split("-")[1]
+            data_plot['actual_max_age'] = age_binning[selected_age_idx].split("-")[1]
 
-        for date in list_dates:
+        data_plot['label'] = f"{status} younger than {data_plot['actual_max_age']}"
+
+        # Decide the color based on the actual max age
+        selected_age = 0
+        for age in age_color.keys():
+            if int(data_plot['actual_max_age']) <= int(age):
+                selected_age = age
+                break
+        data_plot['color'] = age_color[selected_age]
+
+        for date in data_plot['date']:
             n_conf_cases = sum(
                 [input_data["evolution"][date]["epidemiology"]["confirmed"][status]["age"][idx_age]
                  for idx_age in range(selected_age_idx+1)]
             )
             if n_conf_cases is None:
                 raise ValueError(f"Missing data at 'evolution'->'{date}'->'epidemiology'->'confirmed'->'{status}'->'age'")
-            list_confirmed_cases.append(n_conf_cases)
+            data_plot['value'].append(n_conf_cases)
 
-        return list_dates, list_confirmed_cases, actual_max_age
+        return data_plot
 
 
 def create_confirmed_plot(input_data, sex=False, max_ages=[], status="total", save=False):
-    color = {"male": "#00C4AA",
-             "female": "#8700F9"}
-    linestyle = {"total": "-",
-                 "new": "--"}
-
     if sex and len(max_ages) > 0:
         raise ValueError("'sex' and 'max_ages' cannot be specified at the same time")
     if not sex and len(max_ages) == 0:
@@ -175,23 +203,23 @@ def create_confirmed_plot(input_data, sex=False, max_ages=[], status="total", sa
 
     fig = plt.figure(figsize=(10, 10))
 
+    data_plots = []
     if sex:
         type_plot = "sex"
         for sex_type in ['male', 'female']:
-            list_dates, list_confirmed_cases = generate_data_plot_confirmed(input_data, sex_type, None, status)
-            plt.plot(list_dates, list_confirmed_cases,
-                     linestyle=linestyle[status], label=f"{status} {sex_type}", color=color[sex_type])
+            data_plots.append(generate_data_plot_confirmed(input_data, sex_type, None, status))
     else:
         type_plot = "age"
         for age in max_ages:
-            list_dates, list_confirmed_cases, actual_age = generate_data_plot_confirmed(input_data, None, age, status)
-            plt.plot(list_dates, list_confirmed_cases,
-                     linestyle=linestyle[status], label=f"{status} younger than {actual_age}")
+            data_plots.append(generate_data_plot_confirmed(input_data, None, age, status))
 
     fig.autofmt_xdate()  # To show dates nicely
-    region_name = input_data["region"]["name"]
-    plt.title(f"Confirmed cases in {region_name}")
 
+    for dp in data_plots:
+        plt.plot('date', 'value', data=dp, linestyle=dp['linestyle'], label=dp['label'], color=dp['color'])
+
+    region_name = input_data['region']['name']
+    plt.title(f"Confirmed cases in {region_name}")
     plt.xlabel("Date")
     plt.ylabel("# Cases")
     plt.legend()
