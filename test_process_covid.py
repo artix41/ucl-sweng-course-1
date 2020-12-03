@@ -157,5 +157,3 @@ def test_generate_data_plot_confirmed():
 
     with raises(ValueError) as exception:
         generate_data_plot_confirmed(input_data, sex=None, max_age="infinity", status="new")
-
-    dp = generate_data_plot_confirmed(input_data)
