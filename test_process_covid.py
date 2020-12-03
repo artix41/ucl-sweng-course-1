@@ -138,3 +138,24 @@ def test_hospital_vs_confirmed():
                                 "01-02-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 20}}},
                                                "epidemiology": {"confirmed": {"new": {"all": 100}}}}}}
     assert hospital_vs_confirmed(input_data) == (["01-02-2020"], [0.2])
+
+
+def test_generate_data_plot_confirmed():
+    input_data = {"evolution": {"01-01-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 2}}},
+                                               "epidemiology": {"confirmed": {"new": {"all": 20}}}},
+                                "01-02-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 20}}},
+                                               "epidemiology": {"confirmed": {"new": {"all": 100}}}}}}
+
+    with raises(ValueError) as exception:
+        generate_data_plot_confirmed(input_data, sex=4, max_age=None, status="new")
+
+    with raises(ValueError) as exception:
+        generate_data_plot_confirmed(input_data, sex="male", max_age=None, status=5)
+
+    with raises(ValueError) as exception:
+        generate_data_plot_confirmed(input_data, sex="male", max_age=12, status="new")
+
+    with raises(ValueError) as exception:
+        generate_data_plot_confirmed(input_data, sex=None, max_age="infinity", status="new")
+
+    dp = generate_data_plot_confirmed(input_data)
