@@ -119,17 +119,22 @@ def test_load_covid_data():
 
 
 def test_hospital_vs_confirmed():
-    input_data = {"evolution": {"01-01-2020": {"hospitalizations": {"hospitalized": {"new": {"all": None}}},
+    input_data = {"evolution": {"01-01-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 2}}},
                                                "epidemiology": {"confirmed": {"new": {"all": 20}}}},
                                 "01-02-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 20}}},
-                                               "epidemiology": {"confirmed": {"new": {"all": 20}}}}}}
+                                               "epidemiology": {"confirmed": {"new": {"all": 100}}}}}}
 
-    with raises(ValueError) as exception:
-        hospital_vs_confirmed(input_data)
+    assert hospital_vs_confirmed(input_data) == (["01-01-2020", "01-02-2020"], [0.1, 0.2])
 
     input_data = {"evolution": {"01-01-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 20}}},
-                                               "epidemiology": {"confirmed": {"new": {"all": 20}}}},
+                                               "epidemiology": {"confirmed": {"new": {"all": 200}}}},
                                 "01-02-2020": {"hospitalizations": {"hospitalized": {"new": {"all": None}}},
                                                "epidemiology": {"confirmed": {"new": {"all": 20}}}}}}
-    with raises(ValueError) as exception:
-        hospital_vs_confirmed(input_data)
+
+    assert hospital_vs_confirmed(input_data) == (["01-01-2020"], [0.1])
+
+    input_data = {"evolution": {"01-01-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 20}}},
+                                               "epidemiology": {"confirmed": {"new": {"all": None}}}},
+                                "01-02-2020": {"hospitalizations": {"hospitalized": {"new": {"all": 20}}},
+                                               "epidemiology": {"confirmed": {"new": {"all": 100}}}}}}
+    assert hospital_vs_confirmed(input_data) == (["01-02-2020"], [0.2])
