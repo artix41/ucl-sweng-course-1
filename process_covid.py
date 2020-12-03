@@ -98,18 +98,17 @@ def cases_per_population_by_age(input_data):
 
 
 def hospital_vs_confirmed(input_data):
-    list_date = list(input_data["evolution"].keys())
     list_percentage_hosp = []
-    for date in list_date:
+    list_dates = []
+    for date in input_data["evolution"].keys():
         n_hospitalized = input_data["evolution"][date]["hospitalizations"]["hospitalized"]["new"]["all"]
-        if n_hospitalized is None:
-            raise ValueError(f"Missing data at 'evolution'->'{date}'->'hospitalizations'->'hospitalized'->'new'->'all'")
         n_cases = input_data["evolution"][date]["epidemiology"]["confirmed"]["new"]["all"]
-        if n_cases is None:
-            raise ValueError(f"Missing data at 'evolution'->'{date}'->'epidemiology'->'confirmed'->'new'->'all'")
+        if n_hospitalized is None or n_cases is None:
+            continue
         list_percentage_hosp.append(n_hospitalized / n_cases)
+        list_dates.append(date)
 
-    return list_date, list_percentage_hosp
+    return list_dates, list_percentage_hosp
 
 
 def generate_data_plot_confirmed(input_data, sex, max_age, status):
